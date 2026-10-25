@@ -5,7 +5,7 @@ set -Eeuo pipefail
 umask 077
 
 REGISTRY=hub.v.cller.com
-INSTALL_DIR_DEFAULT="${PWD}/game-shelf-deploy"
+INSTALL_DIR_DEFAULT=$PWD
 PROJECT_ARG=''
 REPOSITORY_ARG=''
 IMAGE_SELECTOR_ARG=''
@@ -16,6 +16,7 @@ usage() {
 Usage: bash install.sh [--project NAME] [--repository NAME] [--image TAG|sha256:DIGEST] [--dir PATH]
 
 Installs the platform image from hub.v.cller.com using Docker Compose.
+The current working directory is the default install directory.
 All passwords are entered at a terminal, never as arguments. The first run
 bind-mounts a persistent host directory for the SQLite database and uploaded games.
 Run the same command again with a new image tag or digest to update the service.
