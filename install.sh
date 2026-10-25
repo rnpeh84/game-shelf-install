@@ -6,7 +6,7 @@ umask 077
 
 REGISTRY=hub.v.cller.com
 DEFAULT_PROJECT=game-platform
-DEFAULT_IMAGE_VERSION=0.1.2
+DEFAULT_IMAGE_VERSION=0.1.3
 INSTALL_DIR_DEFAULT=$PWD
 PROJECT_ARG=''
 REPOSITORY_ARG=''
@@ -76,7 +76,34 @@ valid_tag() { [[ $1 =~ ^[A-Za-z0-9_][A-Za-z0-9_.-]{0,127}$ ]]; }
 valid_digest() { [[ $1 =~ ^sha256:[0-9a-fA-F]{64}$ ]]; }
 valid_domain() { [[ $1 =~ ^[a-zA-Z0-9][a-zA-Z0-9.-]*[a-zA-Z0-9]$ ]] && [[ $1 != *..* && $1 != *.-* && $1 != *-.* ]]; }
 valid_port() { [[ $1 =~ ^[0-9]+$ ]] && ((10#$1 >= 1 && 10#$1 <= 65535)); }
-valid_admin_password() { [[ ${#1} -ge 12 && $1 =~ ^[A-Za-z0-9._@%+:/=-]+$ ]]; }
+check_admin_password() {
+  local value=$1 allowed='^[A-Za-z0-9._@%+:/=!^?*&-]+$' invalid=0
+  if ((${#value} < 12)); then
+    printf '비밀번호가 %s자입니다. 최소 12자여야 합니다.\n' "${#value}" >/dev/tty
+    invalid=1
+  fi
+  if [[ ! $value =~ $allowed ]]; then
+    printf '사용할 수 없는 문자가 있습니다. 영문·숫자와 . _ @ %% + : / = - ! ^ ? * & 만 사용할 수 있습니다.\n' >/dev/tty
+    invalid=1
+  fi
+  ((invalid == 0))
+}
+prompt_admin_password() {
+  while :; do
+    ask_secret '관리자 비밀번호 (Enter: 자동 생성)'
+    ADMIN_PASSWORD=$REPLY
+    if [[ -z $ADMIN_PASSWORD ]]; then
+      ADMIN_PASSWORD=$(openssl rand -hex 16) || die '관리자 비밀번호 생성에 실패했습니다.'
+      GENERATED_ADMIN_PASSWORD=1
+      info '관리자 비밀번호를 자동 생성했습니다. 설치 성공 후 터미널에 한 번 표시합니다.'
+      return 0
+    fi
+    if check_admin_password "$ADMIN_PASSWORD"; then
+      return 0
+    fi
+    printf '비밀번호를 다시 입력하거나 Enter를 눌러 자동 생성하세요.\n' >/dev/tty
+  done
+}
 valid_path() {
   local pattern='^/[A-Za-z0-9_./ -]+$'
   [[ $1 =~ $pattern && $1 != *..* ]]
@@ -189,20 +216,18 @@ GENERATED_ADMIN_PASSWORD=0
 if ((EXISTING)); then
   ADMIN_PASSWORD=$(stored ADMIN_PASSWORD "$ENV_FILE")
   PREVIEW_SECRET=$(stored PREVIEW_SECRET "$ENV_FILE")
-  valid_admin_password "$ADMIN_PASSWORD" || die '기존 관리자 비밀번호 형식이 올바르지 않습니다.'
   [[ ${#PREVIEW_SECRET} -ge 32 ]] || die '기존 미리보기 비밀키가 올바르지 않습니다.'
-  info '기존 관리자 비밀번호와 미리보기 키를 유지합니다.'
+  if check_admin_password "$ADMIN_PASSWORD"; then
+    info '기존 관리자 비밀번호와 미리보기 키를 유지합니다.'
+  else
+    printf '기존 %s 의 ADMIN_PASSWORD를 사용할 수 없습니다. 새 비밀번호를 입력하세요.\n' "$ENV_FILE" >/dev/tty
+    command -v openssl >/dev/null 2>&1 || die '자동 비밀번호 생성에 openssl이 필요합니다.'
+    prompt_admin_password
+  fi
 else
   command -v openssl >/dev/null 2>&1 || die '첫 설치에는 openssl이 필요합니다.'
-  info '관리자 비밀번호는 12자 이상이며 영문, 숫자, . _ @ % + : / = - 만 허용합니다.'
-  ask_secret '관리자 비밀번호 (Enter: 자동 생성)'
-  ADMIN_PASSWORD=$REPLY
-  if [[ -z $ADMIN_PASSWORD ]]; then
-    ADMIN_PASSWORD=$(openssl rand -hex 16) || die '관리자 비밀번호 생성에 실패했습니다.'
-    GENERATED_ADMIN_PASSWORD=1
-    info '관리자 비밀번호를 자동 생성했습니다. 설치 성공 후 터미널에 한 번 표시합니다.'
-  fi
-  valid_admin_password "$ADMIN_PASSWORD" || die '관리자 비밀번호 형식이 올바르지 않습니다.'
+  info '관리자 비밀번호는 12자 이상입니다. Enter를 누르면 자동 생성합니다.'
+  prompt_admin_password
   PREVIEW_SECRET=$(openssl rand -hex 32) || die '미리보기 키 생성에 실패했습니다.'
 fi
 
