@@ -6,7 +6,7 @@ umask 077
 
 REGISTRY=hub.v.cller.com
 DEFAULT_PROJECT=game-platform
-DEFAULT_IMAGE_VERSION=0.2.0
+DEFAULT_IMAGE_VERSION=0.3.0
 INSTALL_DIR_DEFAULT=$PWD
 PROJECT_ARG=''
 REPOSITORY_ARG=''
@@ -344,7 +344,12 @@ for ((attempt=1; attempt<=45; attempt++)); do
 done
 ((DEPLOYED)) || die '헬스 체크가 통과하지 못했습니다. 컨테이너 로그를 확인하세요.'
 info "설치 완료: $PLATFORM_ORIGIN"
-info "관리자: $PLATFORM_ORIGIN/admin/login"
+info "로그인: $PLATFORM_ORIGIN/login"
+if ((!EXISTING)); then
+  info '최초 관리자 아이디: admin'
+else
+  info '기존 관리자는 첫 로그인에서 관리자 계정 연결을 완료하세요.'
+fi
 if ((GENERATED_ADMIN_PASSWORD)); then
   printf '관리자 비밀번호 (한 번만 표시): %s\n' "$ADMIN_PASSWORD" >/dev/tty
   info "비밀번호는 $ENV_FILE 에도 저장되어 있습니다."

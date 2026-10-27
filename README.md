@@ -7,11 +7,11 @@
 ```bash
 mkdir -p ~/docker/game-shelf && cd ~/docker/game-shelf
 docker login hub.v.cller.com
-curl -fsSLo install.sh https://raw.githubusercontent.com/rnpeh84/game-shelf-install/v0.2.0/install.sh &&
-  test "$(openssl dgst -sha256 install.sh | awk '{print $NF}')" = "9ce5840ca41212ce857b0ef4cc0e8ef9ca2b370f55ab698d5009e1fbda345b59" &&
+curl -fsSLo install.sh https://raw.githubusercontent.com/rnpeh84/game-shelf-install/v0.3.0/install.sh &&
+  test "$(openssl dgst -sha256 install.sh | awk '{print $NF}')" = "37499b9eead1b0f4d386b646b97663178d21f51d1712f33ee12393a6b43071da" &&
   bash install.sh
 ```
 
 설치 질문에서 Enter를 누르면 기본값을 사용한다. 설치 경로는 스크립트를 실행한 현재 폴더, 데이터 경로는 그 폴더의 `data/`다. 두 경로 모두 설치 중 바꿀 수 있다. 관리자 비밀번호는 직접 입력하거나 비워 두면 자동 생성한다. 길이나 문자 조건에 맞지 않으면 이유를 보여 주고 다시 묻는다. 자동 생성값은 **설치 성공 후 터미널에 한 번 표시**하며 소유자만 읽을 수 있는 `.env`에도 저장한다. 이후 재실행 시 기존 비밀번호와 데이터는 유지된다.
 
-기본 플랫폼 이미지는 `0.2.0`이고, 스크립트가 pull한 이미지의 digest를 Compose 설정에 고정한다. 현재 `0.2.0` 플랫폼 OCI index digest는 `sha256:78571a13948d20756cbc6868e3803106cbe5e2282690fa5249293cc8ee77d31c`다. URL은 `v0.2.0` 릴리스에 고정된다.
+기본 플랫폼 이미지는 `0.3.0`이고, 스크립트가 pull한 이미지의 digest를 Compose 설정에 고정한다. URL은 `v0.3.0` 릴리스에 고정된다. 신규 설치의 최초 관리자 아이디는 `admin`이다. 기존 `0.2.0` 데이터로 갱신하면 공통 로그인 화면에서 기존 관리자 비밀번호와 새 관리자 아이디를 한 번 연결한다.
