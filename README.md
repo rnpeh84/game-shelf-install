@@ -7,11 +7,11 @@
 ```bash
 mkdir -p ~/docker/game-shelf && cd ~/docker/game-shelf
 docker login hub.v.cller.com
-curl -fsSLo install.sh https://raw.githubusercontent.com/rnpeh84/game-shelf-install/v0.3.9/install.sh &&
-  test "$(openssl dgst -sha256 install.sh | awk '{print $NF}')" = "d849a34ed10875b46d67b818cd0da7df0af2b7707f2f7aafcec7bd10b6ce0bb8" &&
+curl -fsSLo install.sh https://raw.githubusercontent.com/rnpeh84/game-shelf-install/v0.4.0/install.sh &&
+  test "$(openssl dgst -sha256 install.sh | awk '{print $NF}')" = "bc865eed08fbd5e5961da6e1464753a163e76da8ae32890a527eea23d44cba4e" &&
   bash install.sh
 ```
 
 설치 질문에서 Enter를 누르면 기본값을 사용한다. 설치 경로는 스크립트를 실행한 현재 폴더, 데이터 경로는 그 폴더의 `data/`다. 두 경로 모두 설치 중 바꿀 수 있다. 관리자 비밀번호는 직접 입력하거나 비워 두면 자동 생성한다. 길이나 문자 조건에 맞지 않으면 이유를 보여 주고 다시 묻는다. 자동 생성값은 **설치 성공 후 터미널에 한 번 표시**하며 소유자만 읽을 수 있는 `.env`에도 저장한다. 이후 재실행 시 기존 비밀번호와 데이터는 유지된다.
 
-기본 플랫폼 이미지는 `0.3.9`이고, 스크립트가 pull한 이미지의 digest를 Compose 설정에 고정한다. URL은 `v0.3.9` 릴리스에 고정된다. 신규 설치의 최초 관리자 아이디는 `admin`이다. 기존 `0.2.0` 데이터로 갱신하면 공통 로그인 화면에서 기존 관리자 비밀번호와 새 관리자 아이디를 한 번 연결한다.
+기본 플랫폼 이미지는 `0.4.0`이고, 스크립트가 pull한 이미지의 digest를 Compose 설정에 고정한다. URL은 `v0.4.0` 릴리스에 고정된다. 신규 설치의 최초 관리자 아이디는 `admin`이다. 가입 가능 여부는 관리자 정책에서 열고 닫는다. 가입한 사용자는 개발자 승인을 신청하고, 관리자의 승인을 받아야 게임을 올릴 수 있다. 기존 `0.2.0` 데이터로 갱신하면 공통 로그인 화면에서 기존 관리자 비밀번호와 새 관리자 아이디를 한 번 연결한다.
